@@ -25,7 +25,7 @@ SECRET_KEY = '9@(xy(rf6%8-*hqmcbjshp6ev+05*)h2nmn81v=#rd6ds&uvc7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['UEFAtool.pythonanywhere.com']
 
 
 # Application definition
