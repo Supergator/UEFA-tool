@@ -25,7 +25,9 @@ SECRET_KEY = '9@(xy(rf6%8-*hqmcbjshp6ev+05*)h2nmn81v=#rd6ds&uvc7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['UEFAtool.pythonanywhere.com']
+ALLOWED_HOSTS = ['UEFAtool.pythonanywhere.com',
+                'localhost'
+]
 
 
 # Application definition
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'mysite'
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
