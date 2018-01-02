@@ -1,4 +1,9 @@
-
+#CriteriaForm {
+  margin-left: 10px;
+  /*margins were added beacuse of problem with form-group behavior*/
+  margin-right:15px;
+  margin-left:15px;
+}
 /*header--------------------------------*/
 #navigation-purple {
     padding-bottom: 0px;
