@@ -1,0 +1,141 @@
+#CriteriaForm {
+  margin-left: 10px;
+  /*margins were added beacuse of problem with form-group behavior*/
+  margin-right:15px;
+  margin-left:15px;
+}
+/*header--------------------------------*/
+#navigation-purple {
+    padding-bottom: 0px;
+    margin: 0;
+    background-color: #7a60e9;
+    border: none;
+    border-radius: 0;
+}
+
+#navigation-purple .nav {
+    margin-left: -15px;
+}
+
+#navigation-purple .nav > li {
+    border-bottom: 2px solid transparent;
+    margin-bottom: 34px;
+}
+
+#navigation-purple .nav > li:hover {
+    border-bottom-color: #fff;
+}
+
+#navigation-purple .nav > li:focus {
+    background-color: transparent;
+}
+
+#navigation-purple .nav > li > a {
+    font-size: 18px;
+    color: white;
+}
+
+#navigation-purple .nav > li > a:hover,
+#navigation-purple .nav > li > a:focus {
+    background-color: transparent;
+}
+
+#navigation-purple .navbar-collapse {
+    padding-top: 35px;
+}
+
+#navigation-purple .avatar {
+    height: 80px;
+    float: right;
+    margin-top: 19px;
+}
+
+#navigation-purple .icon-bar {
+    background-color: white;
+}
+
+#navigation-purple .navbar-toggle {
+    border-color: white;
+    float: left;
+    margin-left: 25px;
+    margin-top: 30px;
+}
+
+#navigation-purple .navbar-toggle:hover,
+#navigation-purple .navbar-toggle:focus {
+     background-color: transparent;
+}
+
+@media screen and (max-width: 767px) {
+
+    #navigation-purple .navbar-collapse {
+        padding-top: 0;
+    }
+
+    #navigation-purple ul>li {
+        float: left;
+        clear: left;
+        margin-left: 4px;
+        padding-bottom: 8px;
+        margin-bottom: 5px !important;
+    }
+
+    #navigation-purple ul>li>a {
+        padding-bottom: 2px;
+    }
+
+    #navigation-purple ul>li:hover {
+        border-bottom: 2px solid white;
+    }
+
+    #navigation-purple .avatar {
+        height: 60px;
+        margin-top: 18px;
+        margin-bottom: 18px;
+    }
+}
+/*----------------------------------------------------*/
+/* =Footer
+-------------------------------------------------------------- */
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  content: "";
+  clear: both;
+  height: 0; }
+
+  /* =Info Bar
+-------------------------------------------------------------- */
+#info-bar {
+  background-color: #7a60e9; }
+  #info-bar a {
+    color: white;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin: 0;
+    padding: 10px; }
+    #info-bar a:hover {
+      background-color: #0793e2; }
+  #info-bar span.all-tutorials,
+  #info-bar span.back-to-tutorial {
+    display: block;
+    width: 50%; }
+  #info-bar span.all-tutorials {
+    float: left;
+    text-align: left; }
+  #info-bar span.back-to-tutorial {
+    float: right;
+    text-align: right; }
+
+  #FooterID {
+    position:fixed;
+    bottom:0;
+    width:100%;
+    /*height:40px;    Height of the footer */
+    background:#7a60e9;
+  }
+
+#addMargin  {
+  margin-bottom: 30px;
+}
