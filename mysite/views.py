@@ -13,17 +13,19 @@ def criteria(request):
     data=list(Match.objects.values('matchID','matchID2','Team1','Team2').filter(matchID2=15000))
     print(data)
     context={'data':data}
-    print(request.session)
+    #print(request.session)
 
 
     request.session['xx'] = data
-
-    return render(request, 'mysite/base_page.html', context)
-    l#oad_template = request.path.split('/')[-1]
+    #load_template = request.path.split('/')
     #print(load_template)
+    return render(request, 'mysite/base_page.html', context)
+
     #template = loader.get_template('mysite/' + 'base_page.html')
     #return HttpResponse(template.render(context, request))
 
-def match_details(request):
+def match_details(request,a):
     xx = request.session.get('xx')
-    return render(request, 'mysite/matches_list.html', {'num':xx})
+    print(request.path)
+    #print(template)
+    return render(request, 'mysite'+request.path, {'num':xx})
