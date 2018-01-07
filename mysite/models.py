@@ -12,6 +12,8 @@ class Match(models.Model):
     Team2 = models.CharField(max_length=200)
     country1 = models.CharField(max_length=20)
     country2 = models.CharField(max_length=20)
+    countryID1 = models.IntegerField()
+    countryID2 = models.IntegerField()
     goals1 = models.IntegerField()
     goals2 = models.IntegerField()
     matchYear=models.CharField(max_length=20)
