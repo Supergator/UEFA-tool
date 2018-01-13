@@ -26,7 +26,7 @@
         <div class="form-group row">
           <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm col-xs-4">Season Start</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
+            <select class="custom-select form-control" id="StSeasonBtn" onclick="checkSeasons()">
               <option selected>Select season</option>
               <option value="1956">1956/1957</option>
               <option value="1957">1957/1958</option>
@@ -97,8 +97,8 @@
         <div class="form-group row">
           <label for="colFormLabel" class="col-sm-2 col-form-label col-xs-4">Season End</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
-              <option selected>Select season</option>
+            <select class="custom-select form-control" id="EndSeasonBtn">
+              <option selected value="3000">Select season</option>
               <option value="1956">1956/1957</option>
               <option value="1957">1957/1958</option>
               <option value="1958">1958/1959</option>
@@ -167,8 +167,8 @@
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Country</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
-              <option selected>Open this select menu</option>
+            <select class="custom-select form-control" id="CountryBtn" onclick="disableBtn()">
+              <option selected>Select Country</option>
               <option value="1">One</option>
               <option value="2">Two</option>
               <option value="3">Three</option>
@@ -178,8 +178,8 @@
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Club</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
-              <option selected>Open this select menu</option>
+            <select class="custom-select form-control" disabled id="ClubBtn">
+              <option selected id="optionClub" >Select Country Firstly</option>
               <option value="1">One</option>
               <option value="2">Two</option>
               <option value="3">Three</option>
@@ -206,7 +206,7 @@
         </div>
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Select Stage</label>
-          <div class="col-sm-4 col-xs-8">
+          <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control">
               <option selected>Open this select menu</option>
               <option value="1">One</option>
@@ -215,17 +215,73 @@
             </select>
           </div>
         </div>
-        <button class="btn btn-primary" type="submit">Submit</button>
-      </form>
 
+        <button class="btn btn-primary" type="button" onclick="SubmitBtn()" style="margin-bottom: 30px;">Submit</button>
+      </form>
+<!--
+<button type="button" onclick="alert('Hello World!')">Click Me!</button>
+-->
 <p>{{ data }}</p>
       {% include "mysite/footer.html" %}
 
     </body>
-<script >
+<script>
+
+function disableBtn() {
+    if (document.getElementById("CountryBtn").value != "Select Country"){
+      document.getElementById("ClubBtn").disabled = false;
+      document.getElementById("optionClub").innerHTML= "Select Club";
+    } else {
+      document.getElementById("ClubBtn").disabled = true;
+      document.getElementById("optionClub").innerHTML= "Select Country Firstly";
+    }
+    //document.getElementById("firstbutton").disabled = false;
+}
+
+function checkSeasons(){
+
+  if (document.getElementById("StSeasonBtn").value != "Select season"){
+
+    var elements = document.getElementById("EndSeasonBtn").getElementsByTagName('option');
+    for (var i = 0; i < elements.length; i++) {
+
+        if (document.getElementById("StSeasonBtn").value > elements[i].value){
+        //console.log(elements[i].value)
+        elements[i].disabled=true;
+      }else {
+        elements[i].disabled=false;
+      }
+    }
+    if (document.getElementById("StSeasonBtn").value > document.getElementById("EndSeasonBtn").value){
+    document.getElementById("EndSeasonBtn").value="3000"}
+  }
+}
+
+function SubmitBtn() {
+         $.ajax({
+             url:"/GetData/",
+             method: "GET", // or POST
+             dataType: "json",
+             data: {
+             //csrfmiddlewaretoken: csrf_token,
+             a:"aa",
+             b:"bb"
+              },
+             success:function(results){
+               console.log("bla")
+             },
+             failure: function(qXHR, textStatus, errorThrown) {
+             handleError(qXHR, textStatus, errorThrown)
+             }
+         }).fail(function(qXHR, textStatus, errorThrown){
+              handleError(qXHR, textStatus, errorThrown)
+         });
+  };
+
 var aa
 aa="{{ data }}"
-console.log(aa)
+
+
 
 </script>
 

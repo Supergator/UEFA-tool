@@ -7,6 +7,7 @@ favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 urlpatterns = [
     url(r'^$', views.criteria, name='criteria'),
     url(r'^favicon\.ico$', favicon_view),
+    url(r'^GetData/', views.GetData, name='GetData'),
     url(r'^(\D+)$', views.match_details, name='match_details'),
 
 ]
