@@ -7,15 +7,17 @@ import os.path
 from django.http import HttpResponse
 import re
 from django.http import JsonResponse
+from django.core import serializers
+import json
 
 # Create your views here.
 def criteria(request):
     #print(list(Match.objects.values('matchID','matchYear','Team1','Team2').filter(CoinToss=0)))
-    data=list(Match.objects.values('matchID','matchID2','Team1','Team2').filter(matchID2=15000))
+    data=list(Match.objects.values('matchID','matchID2','Team1','Team2','matchYear').filter(matchID= 24938))
     #print(data)
     context={'data':data}
     #print(request.session)
-
+    print(data)
     #request.session['xx'] = data
     #load_template = request.path.split('/')
     #print(load_template)
@@ -79,6 +81,22 @@ def GetData(request):
         output2 = json.dumps(actual_data_CBA, default=datetime_handler)
         Final_output={'SA':output,'CBA':output2}
     Final_output={'a':1,'b':2}
+    StartSelected=request.GET.get('StartSelected')
+    EndSelected=request.GET.get('EndSelected')
+    CountrySelected=request.GET.get('CountrySelected')
+
+    data = Match.objects.filter(countryID1=int(CountrySelected)).filter(matchYear__range=
+    (StartSelected,EndSelected)).order_by('matchID')
+
+    raw_data = serializers.serialize('python', data, fields=('Team1','Team2','goals1','goals2','matchYear','stage','matchType'))
+
+    actual_data = [d['fields'] for d in raw_data]
+    #actual_data_pk_SA = [d['pk'] for d in raw_data]
+
+    #for dataSA, pk in zip(actual_data_SA, actual_data_pk_SA):
+    #    dataSA.update({"id":pk})
+    output = json.dumps(actual_data, ensure_ascii=False)
+    print(output)
     #output = json.dumps(data, default=datetime_handler)
     #print(Final_output)
     return JsonResponse(Final_output, safe=False)#,JsonResponse(output2, safe=False)
