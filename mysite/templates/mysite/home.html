@@ -265,7 +265,8 @@
 <!--
 <button type="button" onclick="alert('Hello World!')">Click Me!</button>
 -->
-<p>{{ data }}</p>
+
+
       {% include "mysite/footer.html" %}
 
     </body>
@@ -318,7 +319,7 @@ function SubmitBtn() {
              CountrySelected:CountrySelected
               },
              success:function(results){
-               console.log("bla")
+               console.log(results)
              },
              failure: function(qXHR, textStatus, errorThrown) {
              handleError(qXHR, textStatus, errorThrown)
@@ -328,8 +329,12 @@ function SubmitBtn() {
          });
   };
 
-var aa
-aa="{{ data }}"
+var matches
+matches="{{ matches }}"
+matches=matches.replace(/&quot;/g,"'")
+matches=eval(matches)
+console.log(matches)
+
 
 
 
