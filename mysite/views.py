@@ -40,7 +40,6 @@ def matches_list(request):
     CountrySelected =criteria['CountrySelected']
 
     data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))).filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
-    
 
     return render(request, 'mysite'+request.path, {'data':data})
 
@@ -61,3 +60,17 @@ def GetData(request):
     request.session['criteria'] = data
     #print(data)
     return JsonResponse({'criteria':data}, safe=False)#,JsonResponse(output2, safe=False)
+
+def GetClubs(request):
+
+    CountryCode=request.GET.get('CountryCode')
+
+    data = Match.objects.filter(countryID1=int(CountryCode)).values('Team1').distinct().order_by('Team1')
+    #raw_data = serializers.serialize('json', data)
+    actual_data = [d['Team1'] for d in data]
+    print(actual_data)
+    #output = json.dumps(actual_data, ensure_ascii=False)
+    #print(output)
+    #request.session['criteria'] = data
+    #print(data)
+    return JsonResponse({'clubs':actual_data}, safe=False)#,JsonResponse(output2, safe=False)

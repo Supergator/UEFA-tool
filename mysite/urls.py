@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.criteria, name='home'),
     url(r'^favicon\.ico$', favicon_view),
     url(r'^GetData/', views.GetData, name='GetData'),
+    url(r'^GetClubs/', views.GetClubs, name='GetClubs'),
     url(r'^matches_list\.html$', views.matches_list, name='matches_list'),
     url(r'^(\D+)$', views.match_details, name='match_details'),
 

@@ -27,7 +27,7 @@
           <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm col-xs-4">Season Start</label>
           <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control" id="StSeasonBtn" onclick="checkSeasons()">
-              <option selected>Select season</option>
+              <option selected value="0">Select season</option>
               <option value="1956">1955/1956</option>
               <option value="1957">1956/1957</option>
               <option value="1958">1957/1958</option>
@@ -98,7 +98,7 @@
           <label for="colFormLabel" class="col-sm-2 col-form-label col-xs-4">Season End</label>
           <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control" id="EndSeasonBtn">
-              <option selected value="3000">Select season</option>
+              <option selected value="0">Select season</option>
               <option value="1956">1955/1956</option>
               <option value="1957">1956/1957</option>
               <option value="1958">1957/1958</option>
@@ -168,7 +168,7 @@
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Country</label>
           <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control" id="CountryBtn" onclick="disableBtn()">
-              <option selected>Select Country</option>
+              <option selected value="99">Select Country</option>
               <option value="24">Albania</option>
               <option value="23">Andorra</option>
               <option value="31">Austria</option>
@@ -224,9 +224,6 @@
           <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control" disabled id="ClubBtn">
               <option selected id="optionClub" >Select Country Firstly</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
             </select>
           </div>
         </div>
@@ -272,15 +269,20 @@
     </body>
 <script>
 
+var checkCountry = document.getElementById("CountryBtn").value
+
 function disableBtn() {
-    if (document.getElementById("CountryBtn").value != "Select Country"){
-      document.getElementById("ClubBtn").disabled = false;
-      document.getElementById("optionClub").innerHTML= "Select Club";
-    } else {
-      document.getElementById("ClubBtn").disabled = true;
-      document.getElementById("optionClub").innerHTML= "Select Country Firstly";
+    if ( checkCountry != document.getElementById("CountryBtn").value){
+      if (document.getElementById("CountryBtn").value != "99"){
+        document.getElementById("ClubBtn").disabled = false;
+        document.getElementById("optionClub").innerHTML= "Select Club";
+        GetCountries(document.getElementById("CountryBtn").value);
+        checkCountry = document.getElementById("CountryBtn").value
+      } else {
+        document.getElementById("ClubBtn").disabled = true;
+        document.getElementById("optionClub").innerHTML= "Select Country Firstly";
+      }
     }
-    //document.getElementById("firstbutton").disabled = false;
 }
 
 function checkSeasons(){
@@ -298,7 +300,7 @@ function checkSeasons(){
       }
     }
     if (document.getElementById("StSeasonBtn").value > document.getElementById("EndSeasonBtn").value){
-    document.getElementById("EndSeasonBtn").value="3000"}
+    document.getElementById("EndSeasonBtn").value="0"}
   }
 }
 
@@ -307,6 +309,8 @@ function SubmitBtn() {
         var StartSelected= document.getElementById("StSeasonBtn").value
         var EndSelected=document.getElementById("EndSeasonBtn").value
         var CountrySelected=document.getElementById("CountryBtn").value
+
+        if (StartSelected != 0 & EndSelected != 0 & CountrySelected != 0){
 
          $.ajax({
              url:"/GetData/",
@@ -320,6 +324,7 @@ function SubmitBtn() {
               },
              success:function(results){
                console.log(results)
+               window.alert("Your criteria are approved! \n \nNow, you can see the the list of all matches, statistics and stats against another countries.");
              },
              failure: function(qXHR, textStatus, errorThrown) {
              handleError(qXHR, textStatus, errorThrown)
@@ -327,16 +332,43 @@ function SubmitBtn() {
          }).fail(function(qXHR, textStatus, errorThrown){
               handleError(qXHR, textStatus, errorThrown)
          });
-  };
+       } else {
+         window.alert("You need fill mandatory fields: range of seasons and country")
+       }
+  }
 
-var matches
-matches="{{ matches }}"
-matches=matches.replace(/&quot;/g,"'")
-matches=eval(matches)
-console.log(matches)
+function GetCountries(CountryCode){
+  console.log(CountryCode)
+  $.ajax({
+      url:"/GetClubs/",
+      method: "GET", // or POST
+      dataType: "json",
+      data: {
+      //csrfmiddlewaretoken: csrf_token,
+      CountryCode:CountryCode
+       },
+      success:function(results){
+        console.log(results['clubs']);
 
+        results['clubs'].forEach(addClubs);
+      },
+      failure: function(qXHR, textStatus, errorThrown) {
+      handleError(qXHR, textStatus, errorThrown)
+      }
+  }).fail(function(qXHR, textStatus, errorThrown){
+       handleError(qXHR, textStatus, errorThrown)
+  });
 
+}
 
+var select = document.getElementById('ClubBtn');
+
+function addClubs(item){
+  var opt = document.createElement('option');
+  opt.value = item;
+  opt.innerHTML = item;
+  select.appendChild(opt);
+}
 
 </script>
 
