@@ -223,36 +223,43 @@
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Club</label>
           <div class="col-sm-4 col-xs-4">
             <select class="custom-select form-control" disabled id="ClubBtn">
-              <option selected id="optionClub" >Select Country Firstly</option>
+              <option selected id="optionClub" value="0" >Select Country Firstly</option>
             </select>
           </div>
         </div>
+        <!--
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Include qualification stages?</label>
           <div class="col-sm-4 col-xs-4">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-          <label class="form-check-label" for="defaultCheck1">YES</label>
+            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+            <label class="form-check-label" for="defaultCheck1">YES</label>
           </div>
         </div>
+      -->
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Select Cup</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
-              <option selected>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <select class="custom-select form-control" id="CupBtn">
+              <option selected value="0">Select Cup</option>
+              <option value="CHAMPIONS CUP">CHAMPIONS CUP</option>
+              <option value="CHAMPIONS LEAGUE">CHAMPIONS LEAGUE</option>
+              <option value="CUP WINNERS CUP">CUP WINNERS CUP</option>
+              <option value="EUROPA LEAGUE">EUROPA LEAGUE</option>
+              <option value="INTER-CITIES FAIRS CUP">INTER-CITIES FAIRS CUP</option>
+              <option value="UEFA CUP">UEFA CUP</option>
             </select>
           </div>
         </div>
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Select Stage</label>
           <div class="col-sm-4 col-xs-4">
-            <select class="custom-select form-control">
-              <option selected>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+            <select multiple class="custom-select form-control" style="height:120px" id="StageBtn">
+              <option selected value="1">Qualifications</option>
+              <option selected value="2">Group Stage</option>
+              <option selected value="3">Round Stage</option>
+              <option selected value="4">Quarter Finals</option>
+              <option selected value="5">Semi Finals</option>
+              <option selected value="6">Final</option>
             </select>
           </div>
         </div>
@@ -275,7 +282,7 @@ function disableBtn() {
     if ( checkCountry != document.getElementById("CountryBtn").value){
       if (document.getElementById("CountryBtn").value != "99"){
         document.getElementById("ClubBtn").disabled = false;
-        document.getElementById("optionClub").innerHTML= "Select Club";
+        document.getElementById("optionClub").innerHTML= "All clubs for selected country";
         GetCountries(document.getElementById("CountryBtn").value);
         checkCountry = document.getElementById("CountryBtn").value
       } else {
@@ -309,18 +316,24 @@ function SubmitBtn() {
         var StartSelected= document.getElementById("StSeasonBtn").value
         var EndSelected=document.getElementById("EndSeasonBtn").value
         var CountrySelected=document.getElementById("CountryBtn").value
-
+        var ClubSelected=document.getElementById("ClubBtn").value
+        var CupSelected=document.getElementById("CupBtn").value
+        var StageSelected = getSelectValues(document.getElementById("StageBtn"))
+        //console.log(StageSelected)
         if (StartSelected != 0 & EndSelected != 0 & CountrySelected != 0){
 
          $.ajax({
-             url:"/GetData/",
+             url:"/SetCriteria/",
              method: "GET", // or POST
              dataType: "json",
              data: {
              //csrfmiddlewaretoken: csrf_token,
              StartSelected:StartSelected,
              EndSelected:EndSelected,
-             CountrySelected:CountrySelected
+             CountrySelected:CountrySelected,
+             ClubSelected:ClubSelected,
+             CupSelected:CupSelected,
+             StageSelected:StageSelected
               },
              success:function(results){
                console.log(results)
@@ -337,6 +350,21 @@ function SubmitBtn() {
        }
   }
 
+  function getSelectValues(select) {
+    var result = [];
+    var options = select && select.options;
+    var opt;
+
+    for (var i=0, iLen=options.length; i<iLen; i++) {
+      opt = options[i];
+
+      if (opt.selected) {
+        result.push(opt.value || opt.text);
+      }
+    }
+    return result;
+  }
+
 function GetCountries(CountryCode){
   console.log(CountryCode)
   $.ajax({
@@ -348,8 +376,8 @@ function GetCountries(CountryCode){
       CountryCode:CountryCode
        },
       success:function(results){
-        console.log(results['clubs']);
-
+        //console.log(results['clubs']);
+        removeClubs();
         results['clubs'].forEach(addClubs);
       },
       failure: function(qXHR, textStatus, errorThrown) {
@@ -362,6 +390,12 @@ function GetCountries(CountryCode){
 }
 
 var select = document.getElementById('ClubBtn');
+
+function removeClubs(){
+  while (select.length > 1) {
+    select.remove(1);
+  }
+}
 
 function addClubs(item){
   var opt = document.createElement('option');

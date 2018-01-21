@@ -21,6 +21,7 @@ class Match(models.Model):
     HomeAway=models.CharField(max_length=20)
     matchType=models.CharField(max_length=20)
     stage = models.CharField(max_length=20)
+    stageID = models.IntegerField()
     penalties=models.CharField(max_length=20)
     CoinToss=models.IntegerField()
 

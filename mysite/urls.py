@@ -5,11 +5,11 @@ from django.views.generic.base import RedirectView
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
 
 urlpatterns = [
-    url(r'^$', views.criteria, name='home'),
+    url(r'^$', views.home_page, name='home_page'),
     url(r'^favicon\.ico$', favicon_view),
-    url(r'^GetData/', views.GetData, name='GetData'),
+    url(r'^SetCriteria/', views.SetCriteria, name='SetCriteria'),
     url(r'^GetClubs/', views.GetClubs, name='GetClubs'),
-    url(r'^matches_list\.html$', views.matches_list, name='matches_list'),
-    url(r'^(\D+)$', views.match_details, name='match_details'),
+    #url(r'^matches_list\.html$', views.matches_list, name='matches_list'),
+    url(r'^(\D+)$', views.load_page, name='load_page'),
 
 ]
