@@ -50,6 +50,8 @@ def load_page(request,a):
 
     if bool(re.search('/home.html$', request.path)):
         return render(request, 'mysite'+'/home.html', {})
+    if bool(re.search('/test.html$', request.path)):
+        return render(request, 'mysite'+'/test.html', {})        
     #print(request.path)
     #return render(request, 'mysite'+request.path, {})
 '''
@@ -106,6 +108,7 @@ def GetClubs(request):
 def prepareDataForCountries(request):
 
     criteria = request.session.get('criteria')
+    print(criteria)
     StartSelected =criteria['StartSelected']
     EndSelected =criteria['EndSelected']
     CountrySelected =criteria['CountrySelected']

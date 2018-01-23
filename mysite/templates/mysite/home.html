@@ -23,9 +23,9 @@
       <form id="CriteriaForm">
         <div class="form-group row">
         </div>
-        <div class="form-group row">
+        <div class="form-group row required">
           <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm col-xs-4">Season Start</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select class="custom-select form-control" id="StSeasonBtn" onclick="checkSeasons()">
               <option selected value="0">Select season</option>
               <option value="1956">1955/1956</option>
@@ -92,11 +92,16 @@
               <option value="2017">2016/2017</option>
 
             </select>
+
+            <div class="valid-feedback" id="valid1">
+              Please select season
+            </div>
+
           </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row required">
           <label for="colFormLabel" class="col-sm-2 col-form-label col-xs-4">Season End</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select class="custom-select form-control" id="EndSeasonBtn">
               <option selected value="0">Select season</option>
               <option value="1956">1955/1956</option>
@@ -162,11 +167,14 @@
               <option value="2016">2015/2016</option>
               <option value="2017">2016/2017</option>
             </select>
+            <div class="valid-feedback" id="valid2">
+              Please select season
+            </div>
           </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row required">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Country</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select class="custom-select form-control" id="CountryBtn" onclick="disableBtn()">
               <option selected value="99">Select Country</option>
               <option value="24">Albania</option>
@@ -217,11 +225,14 @@
               <option value="30">Turkey</option>
               <option value="47">Ukraine</option>
             </select>
+            <div class="valid-feedback" id="valid3">
+              Please select country
+            </div>
           </div>
         </div>
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Club</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select class="custom-select form-control" disabled id="ClubBtn">
               <option selected id="optionClub" value="0" >Select Country Firstly</option>
             </select>
@@ -238,7 +249,7 @@
       -->
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Select Cup</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select class="custom-select form-control" id="CupBtn">
               <option selected value="0">Select Cup</option>
               <option value="CHAMPIONS CUP">CHAMPIONS CUP</option>
@@ -252,7 +263,7 @@
         </div>
         <div class="form-group row">
           <label for="colFormLabelLg" class="col-sm-2 col-form-label col-form-label-lg col-xs-4">Select Stage</label>
-          <div class="col-sm-4 col-xs-4">
+          <div class="col-sm-4 col-xs-8">
             <select multiple class="custom-select form-control" style="height:120px" id="StageBtn">
               <option selected value="1">Qualifications</option>
               <option selected value="2">Group Stage</option>
@@ -263,12 +274,17 @@
             </select>
           </div>
         </div>
-
-        <button class="btn btn-primary" type="button" onclick="SubmitBtn()" style="margin-bottom: 30px;">Submit</button>
+        <div class="form-group row">
+          <div class="col-sm-2 col-xs-4">
+            <button class="btn btn-success" type="button" onclick="ClearCriteria()" style="margin-bottom: 30px;">Clear Criteria</button>
+          </div>
+          <div class="col-sm-4 col-xs-8">
+            <button class="btn btn-primary" type="button" onclick="SubmitBtn()" style="margin-bottom: 30px;">Submit</button>
+          </div>
+        </div>
       </form>
-<!--
-<button type="button" onclick="alert('Hello World!')">Click Me!</button>
--->
+
+
 
 
       {% include "mysite/footer.html" %}
@@ -320,7 +336,11 @@ function SubmitBtn() {
         var CupSelected=document.getElementById("CupBtn").value
         var StageSelected = getSelectValues(document.getElementById("StageBtn"))
         //console.log(StageSelected)
-        if (StartSelected != 0 & EndSelected != 0 & CountrySelected != 0){
+        if (StartSelected != 0 & EndSelected != 0 & CountrySelected != 99){
+
+          document.getElementById("valid1").className = "valid-feedback"
+          document.getElementById("valid2").className = "valid-feedback"
+          document.getElementById("valid3").className = "valid-feedback"
 
          $.ajax({
              url:"/SetCriteria/",
@@ -346,7 +366,16 @@ function SubmitBtn() {
               handleError(qXHR, textStatus, errorThrown)
          });
        } else {
-         window.alert("You need fill mandatory fields: range of seasons and country")
+         //window.alert("You need fill mandatory fields: range of seasons and country")
+                if (StartSelected == 0){
+                  document.getElementById("valid1").className = "invalid-feedback"
+                }
+                if (EndSelected == 0){
+                  document.getElementById("valid2").className = "invalid-feedback"
+                }
+                if (CountrySelected == 99){
+                  document.getElementById("valid3").className = "invalid-feedback"
+                }
        }
   }
 
@@ -402,6 +431,14 @@ function addClubs(item){
   opt.value = item;
   opt.innerHTML = item;
   select.appendChild(opt);
+}
+
+function ClearCriteria(){
+  document.getElementById("StSeasonBtn").value ="0"
+  document.getElementById("EndSeasonBtn").value="0"
+  document.getElementById("CountryBtn").value="99"
+  document.getElementById("ClubBtn").value="0"
+  document.getElementById("CupBtn").value="0"
 }
 
 </script>
