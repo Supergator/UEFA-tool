@@ -4,7 +4,7 @@ var Temp = {
 		"mapWidth": 646,
 		"mapHeight": 654,
 		"displayAbbreviations": false,
-		"defaultText": "<h1>Europe</h1><br /><p>Europe is a continent that comprises the westernmost part of Eurasia. Europe is bordered by the Arctic Ocean to the north, the Atlantic Ocean to the west, and the Mediterranean Sea to the south. The eastern boundary with Asia is a historical and cultural construct, as there is no clear physical and geographical separation between them; Europe is generally considered as separated from Asia by the watershed divides of the Ural and Caucasus Mountains, the Ural River, the Caspian and Black Seas, and the waterways of the Turkish Straits.</p><p>Yet the non-oceanic borders of Europe—a concept dating back to classical antiquity—are arbitrary. The primarily physiographic term 'continent' as applied to Europe also incorporates cultural and political elements whose discontinuities are not always reflected by the continent's current overland boundaries.</p>"
+		"defaultText": "<h1>Europe</h1><br /><p>Here you can see the statistics for selected criteria against each Europe country.<br><br>Legend:<br>Green - positive ratio<br>Blue - neutral ratio<br>Red - negative ratio<br>Yellow - country you have already selected in Criteria<br><br>Click on partiuclar country to see details statistics and list of opponents</p>"
 	},
 	"paths": [
 		{

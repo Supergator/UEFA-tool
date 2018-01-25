@@ -49,9 +49,15 @@ def load_page(request,a):
         return render(request, 'mysite'+'/map.html', {})
 
     if bool(re.search('/home.html$', request.path)):
-        return render(request, 'mysite'+'/home.html', {})
+
+        try:
+            criteria = request.session.get('criteria')
+        except:
+            criteria = 'empty'
+
+        return render(request, 'mysite'+'/home.html', {'criteria':criteria})
     if bool(re.search('/test.html$', request.path)):
-        return render(request, 'mysite'+'/test.html', {})        
+        return render(request, 'mysite'+'/test.html', {})
     #print(request.path)
     #return render(request, 'mysite'+request.path, {})
 '''
@@ -108,7 +114,6 @@ def GetClubs(request):
 def prepareDataForCountries(request):
 
     criteria = request.session.get('criteria')
-    print(criteria)
     StartSelected =criteria['StartSelected']
     EndSelected =criteria['EndSelected']
     CountrySelected =criteria['CountrySelected']
@@ -175,8 +180,8 @@ def prepareDataForCountries(request):
             '<p>Stats for selected criteria against the clubs from the country above:<br> Wins - '+ str(win) +' <br>Draws - '+ str(draw) \
             +'<br>Losts - '+ str(lost) +'<br><br>Opponents from this country:<br>'+ ClubListStr +'</p>'
 
+    CountryData[CountrySelected]["color"] = "#feb41c"
+    CountryData[CountrySelected]["enable"] =  True
+    CountryData[CountrySelected]["text"] = '<p>The country you have already selected in Criteria</p>'
 
-    #print(CountryData)
-    #CountryData='a'
-    #return CountryData
     return JsonResponse({'data':CountryData}, safe=False)

@@ -299,7 +299,7 @@ function disableBtn() {
       if (document.getElementById("CountryBtn").value != "99"){
         document.getElementById("ClubBtn").disabled = false;
         document.getElementById("optionClub").innerHTML= "All clubs for selected country";
-        GetCountries(document.getElementById("CountryBtn").value);
+        GetCountries(document.getElementById("CountryBtn").value, false);
         checkCountry = document.getElementById("CountryBtn").value
       } else {
         document.getElementById("ClubBtn").disabled = true;
@@ -394,7 +394,7 @@ function SubmitBtn() {
     return result;
   }
 
-function GetCountries(CountryCode){
+function GetCountries(CountryCode, IfsetCountry){
   console.log(CountryCode)
   $.ajax({
       url:"/GetClubs/",
@@ -405,9 +405,11 @@ function GetCountries(CountryCode){
       CountryCode:CountryCode
        },
       success:function(results){
-        //console.log(results['clubs']);
         removeClubs();
         results['clubs'].forEach(addClubs);
+         if (IfsetCountry){
+           document.getElementById("ClubBtn").value='{{criteria.ClubSelected}}'
+         }
       },
       failure: function(qXHR, textStatus, errorThrown) {
       handleError(qXHR, textStatus, errorThrown)
@@ -439,6 +441,40 @@ function ClearCriteria(){
   document.getElementById("CountryBtn").value="99"
   document.getElementById("ClubBtn").value="0"
   document.getElementById("CupBtn").value="0"
+  document.getElementById("ClubBtn").disabled = true;
+  document.getElementById("optionClub").innerHTML= "Select Country Firstly";
+}
+if ("{{criteria}}" != 'empty'){
+
+  var criteriaStage = '{{criteria.StageSelected}}'
+  criteriaStage = criteriaStage.replace(/&#39;/g,"").replace(/]/g,"").replace("[","")
+  var StageArray = criteriaStage.split(", ");
+
+  document.getElementById("StSeasonBtn").value ='{{criteria.StartSelected}}'
+  document.getElementById("EndSeasonBtn").value='{{criteria.EndSelected}}'
+  document.getElementById("CountryBtn").value='{{criteria.CountrySelected}}'
+  document.getElementById("CupBtn").value='{{criteria.CupSelected}}'
+
+  if ('{{criteria.CountrySelected}}' != "99"){
+    document.getElementById("ClubBtn").disabled = false;
+    document.getElementById("optionClub").innerHTML= "All clubs for selected country";
+  }
+  if ('{{criteria.ClubSelected}}' != "0"){
+    GetCountries('{{criteria.CountrySelected}}', true)
+  } else {
+    GetCountries('{{criteria.CountrySelected}}', false)
+  }
+
+  checkCountry = document.getElementById("CountryBtn").value
+  var selectStage = document.getElementById('StageBtn').options;
+
+  for (var i = 0; i < selectStage.length; i++){
+    if (StageArray.indexOf(selectStage[i].value) != -1){
+      selectStage[i].selected = true
+    } else {
+      selectStage[i].selected = false
+    }
+  }
 }
 
 </script>
