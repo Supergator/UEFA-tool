@@ -14,39 +14,50 @@ from django.db.models import Q
 # Create your views here.
 def home_page(request):
     #print(list(Match.objects.values('matchID','matchYear','Team1','Team2').filter(CoinToss=0)))
-
-    return render(request, 'mysite/home.html',{})
+    try:
+        criteria = request.session.get('criteria')
+    except:
+        criteria = 'empty'
+    if criteria is None:
+        criteria = 'empty'
+    return render(request, 'mysite'+'/home.html', {'criteria':criteria})
 
 def load_page(request,a):
 
     if bool(re.search('/matches_list.html$', request.path)):
 
-        criteria = request.session.get('criteria')
-        StartSelected =criteria['StartSelected']
-        EndSelected =criteria['EndSelected']
-        CountrySelected =criteria['CountrySelected']
-        ClubSelected =criteria['ClubSelected']
-        CupSelected =criteria['CupSelected']
-        StageSelected =criteria['StageSelected']
+        if request.session.get('criteria') is None:
+            criteria = 'emptyRedirect'
+            return render(request, 'mysite'+'/home.html', {'criteria':criteria})
+        else:
+            criteria = request.session.get('criteria')
+            StartSelected =criteria['StartSelected']
+            EndSelected =criteria['EndSelected']
+            CountrySelected =criteria['CountrySelected']
+            ClubSelected =criteria['ClubSelected']
+            CupSelected =criteria['CupSelected']
+            StageSelected =criteria['StageSelected']
 
-        data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))) \
-        .filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
-        if ClubSelected != "0":
-            data = data.filter(Q(Team1=ClubSelected) | Q(Team2=ClubSelected))
-        if CupSelected != "0":
-            data = data.filter(matchType=CupSelected)
-        if StageSelected != ['1', '2', '3', '4', '5', '6']:
-            data = data.filter(stageID__in=StageSelected)
+            data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))) \
+            .filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
+            if ClubSelected != "0":
+                data = data.filter(Q(Team1=ClubSelected) | Q(Team2=ClubSelected))
+            if CupSelected != "0":
+                data = data.filter(matchType=CupSelected)
+            if StageSelected != ['1', '2', '3', '4', '5', '6']:
+                data = data.filter(stageID__in=StageSelected)
 
-        if bool(re.search('/matches_list.html$', request.path)):
+            if bool(re.search('/matches_list.html$', request.path)):
 
-            return render(request, 'mysite'+'/matches_list.html', {'data':data})
+                return render(request, 'mysite'+'/matches_list.html', {'data':data})
 
     if bool(re.search('/map.html$', request.path)):
-        print(request.session.get('criteria'))
-        #CountryData = prepareDataForCountries(data,CountrySelected,ClubSelected)
 
-        return render(request, 'mysite'+'/map.html', {})
+        if request.session.get('criteria') is None:
+            criteria = 'emptyRedirect'
+            return render(request, 'mysite'+'/home.html', {'criteria':criteria})
+        else:
+            return render(request, 'mysite'+'/map.html', {})
 
     if bool(re.search('/home.html$', request.path)):
 
@@ -54,10 +65,10 @@ def load_page(request,a):
             criteria = request.session.get('criteria')
         except:
             criteria = 'empty'
-
+        if criteria is None:
+            criteria = 'empty'
         return render(request, 'mysite'+'/home.html', {'criteria':criteria})
-    if bool(re.search('/test.html$', request.path)):
-        return render(request, 'mysite'+'/test.html', {})
+
     #print(request.path)
     #return render(request, 'mysite'+request.path, {})
 '''
