@@ -13,13 +13,14 @@
         <link rel="stylesheet" type="text/css" href="/static/css/UEFAtool.css">
         <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
         <link rel="shortcut icon" type="image/png" href="{{STATIC_URL}}/favicon.ico"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
 
     <body>
 
 
       {% include "mysite/header.html" %}
-
+<dic class="container">
       <form id="CriteriaForm">
         <div class="form-group row">
         </div>
@@ -251,7 +252,7 @@
           <label for="colFormLabelLg" class="col-sm-3 col-form-label col-form-label-lg col-xs-4">Select Cup</label>
           <div class="col-sm-6 col-xs-8">
             <select class="custom-select form-control" id="CupBtn">
-              <option selected value="0">Select Cup</option>
+              <option selected value="0">All Cups</option>
               <option value="CHAMPIONS CUP">CHAMPIONS CUP</option>
               <option value="CHAMPIONS LEAGUE">CHAMPIONS LEAGUE</option>
               <option value="CUP WINNERS CUP">CUP WINNERS CUP</option>
@@ -283,7 +284,7 @@
           </div>
         </div>
       </form>
-
+</div>
 
 
 
