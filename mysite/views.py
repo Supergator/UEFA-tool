@@ -69,6 +69,33 @@ def load_page(request,a):
             criteria = 'empty'
         return render(request, 'mysite'+'/home.html', {'criteria':criteria})
 
+    if bool(re.search('/statistics.html$', request.path)):
+
+        if request.session.get('criteria') is None:
+            criteria = 'emptyRedirect'
+            return render(request, 'mysite'+'/home.html', {'criteria':criteria})
+        else:
+
+            criteria = request.session.get('criteria')
+            StartSelected =criteria['StartSelected']
+            EndSelected =criteria['EndSelected']
+            CountrySelected =criteria['CountrySelected']
+            ClubSelected =criteria['ClubSelected']
+            CupSelected =criteria['CupSelected']
+            StageSelected =criteria['StageSelected']
+
+            data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))) \
+            .filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
+            if ClubSelected != "0":
+                data = data.filter(Q(Team1=ClubSelected) | Q(Team2=ClubSelected))
+            if CupSelected != "0":
+                data = data.filter(matchType=CupSelected)
+            if StageSelected != ['1', '2', '3', '4', '5', '6']:
+                data = data.filter(stageID__in=StageSelected)
+
+            prepareStatistics(data)
+
+            return render(request, 'mysite'+'/statistics.html', {'data':data})
     #print(request.path)
     #return render(request, 'mysite'+request.path, {})
 '''
@@ -196,3 +223,11 @@ def prepareDataForCountries(request):
     CountryData[CountrySelected]["text"] = '<p>The country you have already selected in Criteria</p>'
 
     return JsonResponse({'data':CountryData}, safe=False)
+
+def prepareStatistics(data):
+
+    GeneralStats = [0,0,0,0,0]
+    HomeStats = [0,0,0,0,0]
+
+    for item in data:
+        print(item.matchYear)

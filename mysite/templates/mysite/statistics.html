@@ -1,0 +1,262 @@
+{% load staticfiles %}
+
+<html>
+    <head>
+        <title>UEFA tool</title>
+<!--
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+-->
+        <link rel="stylesheet" type="text/css" href="/static/css/UEFAtool.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Demo scripts -->
+<!--
+          <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" rel="stylesheet" type="text/css" />
+-->
+
+    </head>
+
+    <body>
+
+      {% include "mysite/header.html" %}
+
+
+        <div class=" tile_count">
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top"> Winned Matches</span>
+            <div class="count" id="TotalNum">0</div>
+            <span class="count_bottom"><i class="green" id="RangeNum" >0 </i> Home Winned Matches</span>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top">Draw Matches</span>
+            <div class="count" id="TotalComNum">0 </div>
+            <span class="count_bottom"><i class="green" id="RangeComNum">0</i> Home Draw Matches</span>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top">Lost Matches</span>
+            <div class="count green" id="TotalPendingNum">0</div>
+            <span class="count_bottom"><i class="green" id="RangePendingNum">0 </i> Home Lost Matches</span>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top">Scored Goals</span>
+            <div class="count" id="TotalOnHoldNum">0</div>
+            <span class="count_bottom"><i class="green" id="RangeOnHoldNum">0 </i> Home Scored Goals</span>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top">Lost Goals</span>
+            <div class="count" id="TotalNotEligibleNum">0</div>
+            <span class="count_bottom"><i class="green" id="RangeNotEligibleNum">0 </i> Home Lost Goals</span>
+          </div>
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+            <span class="count_top">Best Result</span>
+            <div class="count" id="TotalInactiveNum">0</div>
+            <span class="count_bottom"><i class="green" id="RangeInactiveNum">0 </i> - Best Home Result</span>
+          </div>
+        </div>
+
+
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Pie Chart <small>Sessions</small></h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content2">
+              <div id="graph_donut" style="width:100%; height:290px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Bar Charts <small>Sessions</small></h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div id="graph_bar1" style="width:100%; height:280px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Bar Charts <small>Sessions</small></h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div id="graph_bar2" style="width:100%; height:280px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12" id="addMargin" style="padding-bottom:30px">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Stats</h2>
+              <ul class="nav navbar-right panel_toolbox">
+
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <p class="text-muted font-13 m-b-30">Season by season</p>
+
+              <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
+                <thead>
+                  <tr>
+                    <th>Season</th>
+                    <th>Amount of Matches</th>
+                    <th>Wins</th>
+                    <th>Draws</th>
+                    <th>Losts</th>
+                    <th>Scored Goals</th>
+                    <th>Lost Goals</th>
+                    <th>Cup</th>
+                    <th>Stage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for season in data %}
+                      <tr>
+                      <td>{{season.counter}}</td>
+                      <td>{{season.Team1}}</td>
+                      <td>{{season.country1}}</td>
+                      <td>{{season.Team2}}</td>
+                      <td>{{season.country2}}</td>
+                      <td>{{season.goals1}}-{{match.goals2}}</td>
+                      <td>{{season.matchYear|add:-1}}/{{match.matchYear}}</td>
+                      <td>{{season.matchType}}</td>
+                      <td>{{season.stage}}</td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+      {% include "mysite/footer.html" %}
+
+    </body>
+
+        <!-- jQuery -->
+        <script src="/static/build/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="/static/build/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- FastClick -->
+        <script src="/static/build/fastclick/lib/fastclick.js"></script>
+        <!-- NProgress -->
+        <script src="/static/build/nprogress/nprogress.js"></script>
+        <!-- iCheck -->
+        <script src="/static/build/iCheck/icheck.min.js"></script>
+        <!-- DataTables -->
+        <script src="/static/build/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="/static/build/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="/static/build/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="/static/build/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="/static/build/datatables.net-buttons/js/buttons.flash.min.js"></script>
+        <script src="/static/build/datatables.net-buttons/js/buttons.html5.min.js"></script>
+        <script src="/static/build/datatables.net-buttons/js/buttons.print.min.js"></script>
+        <script src="/static/build/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="/static/build/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+        <!--
+        <script src="/static/build/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+        <script src="/static/build/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+        <script src="/static/build/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+      -->
+        <!-- Custom Theme Scripts -->
+        <!--
+        <script src="/static/build/custom.min.js"></script>
+      -->
+        <script src="/static/build/raphael.min.js"></script>
+
+        <script src="/static/build/morris.min.js"></script>
+
+
+    <script type="text/javascript">
+
+    if ($('#graph_donut').length ){
+
+    				Morris.Donut({
+    				  element: 'graph_donut',
+    				  data: [
+    					{label: 'Jam', value: 25},
+    					{label: 'Frosted', value: 40},
+    					{label: 'Custard', value: 25},
+    					{label: 'Sugar', value: 10}
+    				  ],
+    				  colors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+    				  formatter: function (y) {
+    					return y + "%";
+    				  },
+    				  resize: true
+    				});
+    			}
+
+          if ($('#graph_bar1').length){
+
+    				Morris.Bar({
+    				  element: 'graph_bar1',
+    				  data: [
+    					{device: 'iPhone 4', geekbench: 380},
+    					{device: 'iPhone 4S', geekbench: 655},
+    					{device: 'iPhone 3GS', geekbench: 275},
+    					{device: 'iPhone 5', geekbench: 1571},
+    					{device: 'iPhone 5S', geekbench: 655},
+    					{device: 'iPhone 6', geekbench: 2154},
+    					{device: 'iPhone 6 Plus', geekbench: 1144},
+    					{device: 'iPhone 6S', geekbench: 2371},
+    					{device: 'iPhone 6S Plus', geekbench: 1471},
+    					{device: 'Other', geekbench: 1371}
+    				  ],
+    				  xkey: 'device',
+    				  ykeys: ['geekbench'],
+    				  labels: ['Geekbench'],
+    				  barRatio: 0.4,
+    				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+    				  xLabelAngle: 35,
+    				  hideHover: 'auto',
+    				  resize: true
+    				});
+
+    			}
+
+          if ($('#graph_bar2').length){
+
+    				Morris.Bar({
+    				  element: 'graph_bar2',
+    				  data: [
+    					{device: 'iPhone 4', geekbench: 380},
+    					{device: 'iPhone 4S', geekbench: 655},
+    					{device: 'iPhone 3GS', geekbench: 275},
+    					{device: 'iPhone 5', geekbench: 1571},
+    					{device: 'iPhone 5S', geekbench: 655},
+    					{device: 'iPhone 6', geekbench: 2154},
+    					{device: 'iPhone 6 Plus', geekbench: 1144},
+    					{device: 'iPhone 6S', geekbench: 2371},
+    					{device: 'iPhone 6S Plus', geekbench: 1471},
+    					{device: 'Other', geekbench: 1371}
+    				  ],
+    				  xkey: 'device',
+    				  ykeys: ['geekbench'],
+    				  labels: ['Geekbench'],
+    				  barRatio: 0.4,
+    				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+    				  xLabelAngle: 35,
+    				  hideHover: 'auto',
+    				  resize: true
+    				});
+
+    			}
+
+    </script>
+</html>
