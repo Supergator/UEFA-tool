@@ -30,33 +30,33 @@
         <div class=" tile_count">
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top"> Winned Matches</span>
-            <div class="count" id="TotalNum">0</div>
-            <span class="count_bottom"><i class="green" id="RangeNum" >0 </i> Home Winned Matches</span>
+            <div class="count" id="Wins">0</div>
+            <span class="count_bottom"><i class="green" id="HomeWins" >0 </i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Draw Matches</span>
-            <div class="count" id="TotalComNum">0 </div>
-            <span class="count_bottom"><i class="green" id="RangeComNum">0</i> Home Draw Matches</span>
+            <div class="count" id="Draws">0 </div>
+            <span class="count_bottom"><i class="green" id="HomeDraws">0</i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Lost Matches</span>
-            <div class="count green" id="TotalPendingNum">0</div>
-            <span class="count_bottom"><i class="green" id="RangePendingNum">0 </i> Home Lost Matches</span>
+            <div class="count green" id="Losts">0</div>
+            <span class="count_bottom"><i class="green" id="HomeLosts">0 </i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Scored Goals</span>
-            <div class="count" id="TotalOnHoldNum">0</div>
-            <span class="count_bottom"><i class="green" id="RangeOnHoldNum">0 </i> Home Scored Goals</span>
+            <div class="count" id="Scored">0</div>
+            <span class="count_bottom"><i class="green" id="HomeScored">0 </i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Lost Goals</span>
-            <div class="count" id="TotalNotEligibleNum">0</div>
-            <span class="count_bottom"><i class="green" id="RangeNotEligibleNum">0 </i> Home Lost Goals</span>
+            <div class="count" id="LostGoals">0</div>
+            <span class="count_bottom"><i class="green" id="HomeLostGoals">0 </i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Best Result</span>
-            <div class="count" id="TotalInactiveNum">0</div>
-            <span class="count_bottom"><i class="green" id="RangeInactiveNum">0 </i> - Best Home Result</span>
+            <div class="count" id="bestResult">0</div>
+            <span class="count_bottom"><i class="green" id="HomebestResult">0 </i> - Best Home Result</span>
           </div>
         </div>
 
@@ -258,5 +258,38 @@
 
     			}
 
+          $.ajax({
+          		url:"/prepareStats/",
+          		method: "GET", // or POST
+          		dataType: "json",
+          		data: {
+          		//csrfmiddlewaretoken: csrf_token,
+          		 },
+          		success:function(results){
+                  console.log(results)
+                  ProvideNumbers(results['GeneralStats'],results['HomeStats'])
+          		},
+          		failure: function(qXHR, textStatus, errorThrown) {
+          		handleError(qXHR, textStatus, errorThrown)
+          		}
+          }).fail(function(qXHR, textStatus, errorThrown){
+          		 handleError(qXHR, textStatus, errorThrown)
+          });
+
+          function ProvideNumbers(GeneralStats,HomeStats){
+            document.getElementById("Wins").innerHTML = GeneralStats[0]
+            document.getElementById("HomeWins").innerHTML = HomeStats[0]
+            document.getElementById("Draws").innerHTML = GeneralStats[1]
+            document.getElementById("HomeDraws").innerHTML = HomeStats[1]
+            document.getElementById("Losts").innerHTML = GeneralStats[2]
+            document.getElementById("HomeLosts").innerHTML = HomeStats[2]
+            document.getElementById("Scored").innerHTML = GeneralStats[3]
+            document.getElementById("HomeScored").innerHTML = HomeStats[3]
+            document.getElementById("LostGoals").innerHTML = GeneralStats[4]
+            document.getElementById("HomeLostGoals").innerHTML = HomeStats[4]
+            document.getElementById("bestResult").innerHTML = GeneralStats[5] + '-' + GeneralStats[6]
+            document.getElementById("HomebestResult").innerHTML = HomeStats[5] + '-' + HomeStats[6]
+
+          }
     </script>
 </html>

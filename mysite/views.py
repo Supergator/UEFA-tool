@@ -75,27 +75,7 @@ def load_page(request,a):
             criteria = 'emptyRedirect'
             return render(request, 'mysite'+'/home.html', {'criteria':criteria})
         else:
-
-            criteria = request.session.get('criteria')
-            StartSelected =criteria['StartSelected']
-            EndSelected =criteria['EndSelected']
-            CountrySelected =criteria['CountrySelected']
-            ClubSelected =criteria['ClubSelected']
-            CupSelected =criteria['CupSelected']
-            StageSelected =criteria['StageSelected']
-
-            data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))) \
-            .filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
-            if ClubSelected != "0":
-                data = data.filter(Q(Team1=ClubSelected) | Q(Team2=ClubSelected))
-            if CupSelected != "0":
-                data = data.filter(matchType=CupSelected)
-            if StageSelected != ['1', '2', '3', '4', '5', '6']:
-                data = data.filter(stageID__in=StageSelected)
-
-            prepareStatistics(data)
-
-            return render(request, 'mysite'+'/statistics.html', {'data':data})
+            return render(request, 'mysite'+'/statistics.html', {})
     #print(request.path)
     #return render(request, 'mysite'+request.path, {})
 '''
@@ -224,10 +204,97 @@ def prepareDataForCountries(request):
 
     return JsonResponse({'data':CountryData}, safe=False)
 
-def prepareStatistics(data):
+def prepareStatistics(request):
 
-    GeneralStats = [0,0,0,0,0]
-    HomeStats = [0,0,0,0,0]
+    criteria = request.session.get('criteria')
+    StartSelected =criteria['StartSelected']
+    EndSelected =criteria['EndSelected']
+    CountrySelected =criteria['CountrySelected']
+    ClubSelected =criteria['ClubSelected']
+    CupSelected =criteria['CupSelected']
+    StageSelected =criteria['StageSelected']
 
-    for item in data:
-        print(item.matchYear)
+    data = Match.objects.filter(Q(countryID1=int(CountrySelected)) | Q(countryID2=int(CountrySelected))) \
+    .filter(matchYear__range=(StartSelected,EndSelected)).order_by('matchID')
+    if ClubSelected != "0":
+        data = data.filter(Q(Team1=ClubSelected) | Q(Team2=ClubSelected))
+    if CupSelected != "0":
+        data = data.filter(matchType=CupSelected)
+    if StageSelected != ['1', '2', '3', '4', '5', '6']:
+        data = data.filter(stageID__in=StageSelected)
+
+    GeneralStats = [0,0,0,0,0,0,0]
+    HomeStats = [0,0,0,0,0,0,0]
+
+    if ClubSelected != "0":
+        for match in data:
+            if match.Team1 == ClubSelected:
+                if match.goals1 > match.goals2:
+                    GeneralStats[0] +=1
+                    HomeStats[0] +=1
+                    if (match.goals1 - match.goals2) > (GeneralStats[5] - GeneralStats[6]):
+                        GeneralStats[5] = match.goals1
+                        GeneralStats[6] = match.goals2
+                    if (match.goals1 - match.goals2) > (HomeStats[5] - HomeStats[6]):
+                        HomeStats[5] = match.goals1
+                        HomeStats[6] = match.goals2
+                elif match.goals1 == match.goals2:
+                    GeneralStats[1] +=1
+                    HomeStats[1] +=1
+                elif match.goals1 < match.goals2:
+                    GeneralStats[2] +=1
+                    HomeStats[2] +=1
+                GeneralStats[3] += match.goals1
+                GeneralStats[4] += match.goals2
+                HomeStats[3] +=match.goals1
+                HomeStats[4] +=match.goals2
+            elif match.Team2 == ClubSelected:
+                if match.goals1 < match.goals2:
+                    GeneralStats[0] +=1
+                    if (match.goals2 - match.goals1) > (GeneralStats[5] - GeneralStats[6]):
+                        GeneralStats[5] = match.goals2
+                        GeneralStats[6] = match.goals1
+                elif match.goals1 == match.goals2:
+                    GeneralStats[1] +=1
+                elif match.goals1 > match.goals2:
+                    GeneralStats[2] +=1
+                GeneralStats[3] += match.goals2
+                GeneralStats[4] += match.goals1
+    elif ClubSelected == "0":
+        for match in data:
+            if match.countryID1 == int(CountrySelected):
+                if match.goals1 > match.goals2:
+                    GeneralStats[0] +=1
+                    HomeStats[0] +=1
+                    if (match.goals1 - match.goals2) > (GeneralStats[5] - GeneralStats[6]):
+                        GeneralStats[5] = match.goals1
+                        GeneralStats[6] = match.goals2
+                    if (match.goals1 - match.goals2) > (HomeStats[5] - HomeStats[6]):
+                        HomeStats[5] = match.goals1
+                        HomeStats[6] = match.goals2
+                elif match.goals1 == match.goals2:
+                    GeneralStats[1] +=1
+                    HomeStats[1] +=1
+                elif match.goals1 < match.goals2:
+                    GeneralStats[2] +=1
+                    HomeStats[2] +=1
+                GeneralStats[3] += match.goals1
+                GeneralStats[4] += match.goals2
+                HomeStats[3] +=match.goals1
+                HomeStats[4] +=match.goals2
+            elif match.countryID2 == int(CountrySelected):
+                if match.goals1 < match.goals2:
+                    GeneralStats[0] +=1
+                    if (match.goals2 - match.goals1) > (GeneralStats[5] - GeneralStats[6]):
+                        GeneralStats[5] = match.goals2
+                        GeneralStats[6] = match.goals1
+                elif match.goals1 == match.goals2:
+                    GeneralStats[1] +=1
+                elif match.goals1 > match.goals2:
+                    GeneralStats[2] +=1
+                GeneralStats[3] += match.goals2
+                GeneralStats[4] += match.goals1
+
+    #print(GeneralStats)
+    #print(HomeStats)
+    return JsonResponse({"GeneralStats":GeneralStats,"HomeStats":HomeStats}, safe=False)
