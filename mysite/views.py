@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.core import serializers
 import json
 from django.db.models import Q
+from django.db.models import Max, Sum, Count
+from django.db import connection
 
 # Create your views here.
 def home_page(request):
@@ -204,6 +206,13 @@ def prepareDataForCountries(request):
 
     return JsonResponse({'data':CountryData}, safe=False)
 
+def dictfetchall(cursor):
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
 def prepareStatistics(request):
 
     criteria = request.session.get('criteria')
@@ -295,6 +304,129 @@ def prepareStatistics(request):
                 GeneralStats[3] += match.goals2
                 GeneralStats[4] += match.goals1
 
+    seasonStats=[{}]
+    index=0
+    seasonStats[index]["matchYear"]=data[0].matchYear
+    seasonStats[index]["cup"]=data[0].matchType
+    seasonStats[index]["matchAmount"]=0
+    seasonStats[index]["wins"]=0
+    seasonStats[index]["draws"]=0
+    seasonStats[index]["losts"]=0
+    seasonStats[index]["goalscored"]=0
+    seasonStats[index]["goalsLost"]=0
+    seasonStats[index]["laststage"]=0
+
+    if ClubSelected != "0":
+        for match in data:
+
+            if match.matchYear != seasonStats[index]["matchYear"] or match.matchType != seasonStats[index]["cup"]:
+                seasonStats.append({})
+                index +=1
+                seasonStats[index]["matchYear"]=match.matchYear
+                seasonStats[index]["cup"] = match.matchType
+                seasonStats[index]["matchAmount"]=0
+                seasonStats[index]["wins"]=0
+                seasonStats[index]["draws"]=0
+                seasonStats[index]["losts"]=0
+                seasonStats[index]["goalscored"]=0
+                seasonStats[index]["goalsLost"]=0
+                seasonStats[index]["laststage"]=0
+
+            seasonStats[index]["matchAmount"] +=1
+            seasonStats[index]["laststage"] = match.stage
+
+            if match.Team1 == ClubSelected:
+
+                seasonStats[index]["goalscored"] += match.goals1
+                seasonStats[index]["goalsLost"] += match.goals2
+
+                if match.goals1 > match.goals2:
+                    seasonStats[index]["wins"] +=1
+                elif match.goals1 == match.goals2:
+                    seasonStats[index]["draws"] +=1
+                elif match.goals1 < match.goals2:
+                    seasonStats[index]["losts"] +=1
+            elif match.Team2 == ClubSelected:
+
+                seasonStats[index]["goalscored"] += match.goals2
+                seasonStats[index]["goalsLost"] += match.goals1
+
+                if match.goals1 < match.goals2:
+                    seasonStats[index]["wins"] +=1
+                elif match.goals1 == match.goals2:
+                    seasonStats[index]["draws"] +=1
+                elif match.goals1 > match.goals2:
+                    seasonStats[index]["losts"] +=1
+
+    elif ClubSelected == "0":
+        for match in data:
+
+            if match.matchYear != seasonStats[index]["matchYear"] or match.matchType != seasonStats[index]["cup"]:
+                seasonStats.append({})
+                index +=1
+                seasonStats[index]["matchYear"]=match.matchYear
+                seasonStats[index]["cup"] = match.matchType
+                seasonStats[index]["matchAmount"]=0
+                seasonStats[index]["wins"]=0
+                seasonStats[index]["draws"]=0
+                seasonStats[index]["losts"]=0
+                seasonStats[index]["goalscored"]=0
+                seasonStats[index]["goalsLost"]=0
+                seasonStats[index]["laststage"]=0
+
+            seasonStats[index]["matchAmount"] +=1
+            seasonStats[index]["laststage"] = match.stage
+
+            if match.countryID1 == int(CountrySelected):
+
+                seasonStats[index]["goalscored"] += match.goals1
+                seasonStats[index]["goalsLost"] += match.goals2
+
+                if match.goals1 > match.goals2:
+                    seasonStats[index]["wins"] +=1
+                elif match.goals1 == match.goals2:
+                    seasonStats[index]["draws"] +=1
+                elif match.goals1 < match.goals2:
+                    seasonStats[index]["losts"] +=1
+            elif match.countryID2 == int(CountrySelected):
+
+                seasonStats[index]["goalscored"] += match.goals2
+                seasonStats[index]["goalsLost"] += match.goals1
+
+                if match.goals1 < match.goals2:
+                    seasonStats[index]["wins"] +=1
+                elif match.goals1 == match.goals2:
+                    seasonStats[index]["draws"] +=1
+                elif match.goals1 > match.goals2:
+                    seasonStats[index]["losts"] +=1
+
+    #print(seasonStats)
     #print(GeneralStats)
     #print(HomeStats)
-    return JsonResponse({"GeneralStats":GeneralStats,"HomeStats":HomeStats}, safe=False)
+    return JsonResponse({"GeneralStats":GeneralStats,"HomeStats":HomeStats,"seasonStats":seasonStats}, safe=False)
+
+
+    sel = (1, 2, 3, 4, 5, 6)
+    params = [CountrySelected ,CountrySelected ,StartSelected,EndSelected,sel]
+
+    cursor = connection.cursor()
+    cursor.execute("""
+
+    SELECT distinct
+
+        m.countryID1
+    FROM
+        mysite_match as m
+    WHERE
+        (m.countryID1 = %s OR m.countryID2 = %s )
+        AND (m.matchYear BETWEEN %s AND %s )
+        AND
+        CASE WHEN 1=1 THEN (m.Team1 = 'Groclin Grodzisk' OR m.Team2 = 'Groclin Grodzisk') ELSE 1=1  END
+        AND
+        CASE WHEN 1=1 THEN m.matchType = 'UEFA CUP' ELSE 1=1  END
+        AND m.stageID in ( %s )
+    """, params)
+
+    test = dictfetchall(cursor)
+    #test = cursor
+    print(test)

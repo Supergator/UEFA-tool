@@ -113,30 +113,18 @@
                 <thead>
                   <tr>
                     <th>Season</th>
+                    <th>Cup</th>
                     <th>Amount of Matches</th>
                     <th>Wins</th>
                     <th>Draws</th>
                     <th>Losts</th>
                     <th>Scored Goals</th>
                     <th>Lost Goals</th>
-                    <th>Cup</th>
                     <th>Stage</th>
                   </tr>
                 </thead>
-                <tbody>
-                    {% for season in data %}
-                      <tr>
-                      <td>{{season.counter}}</td>
-                      <td>{{season.Team1}}</td>
-                      <td>{{season.country1}}</td>
-                      <td>{{season.Team2}}</td>
-                      <td>{{season.country2}}</td>
-                      <td>{{season.goals1}}-{{match.goals2}}</td>
-                      <td>{{season.matchYear|add:-1}}/{{match.matchYear}}</td>
-                      <td>{{season.matchType}}</td>
-                      <td>{{season.stage}}</td>
-                      </tr>
-                    {% endfor %}
+                <tbody id="tableBody">
+
                 </tbody>
               </table>
             </div>
@@ -147,6 +135,27 @@
       {% include "mysite/footer.html" %}
 
     </body>
+
+    <script>
+      $.ajax({
+          url:"/prepareStats/",
+          method: "GET", // or POST
+          dataType: "json",
+          data: {
+          //csrfmiddlewaretoken: csrf_token,
+           },
+          success:function(results){
+              console.log(results)
+              ProvideNumbers(results['GeneralStats'],results['HomeStats'])
+              createTable(results['seasonStats'])
+          },
+          failure: function(qXHR, textStatus, errorThrown) {
+          handleError(qXHR, textStatus, errorThrown)
+          }
+      }).fail(function(qXHR, textStatus, errorThrown){
+           handleError(qXHR, textStatus, errorThrown)
+      });
+    </script>
 
         <!-- jQuery -->
         <script src="/static/build/jquery/dist/jquery.min.js"></script>
@@ -258,23 +267,7 @@
 
     			}
 
-          $.ajax({
-          		url:"/prepareStats/",
-          		method: "GET", // or POST
-          		dataType: "json",
-          		data: {
-          		//csrfmiddlewaretoken: csrf_token,
-          		 },
-          		success:function(results){
-                  console.log(results)
-                  ProvideNumbers(results['GeneralStats'],results['HomeStats'])
-          		},
-          		failure: function(qXHR, textStatus, errorThrown) {
-          		handleError(qXHR, textStatus, errorThrown)
-          		}
-          }).fail(function(qXHR, textStatus, errorThrown){
-          		 handleError(qXHR, textStatus, errorThrown)
-          });
+
 
           function ProvideNumbers(GeneralStats,HomeStats){
             document.getElementById("Wins").innerHTML = GeneralStats[0]
@@ -289,6 +282,60 @@
             document.getElementById("HomeLostGoals").innerHTML = HomeStats[4]
             document.getElementById("bestResult").innerHTML = GeneralStats[5] + '-' + GeneralStats[6]
             document.getElementById("HomebestResult").innerHTML = HomeStats[5] + '-' + HomeStats[6]
+
+          }
+
+          function createTable (seasonStats){
+
+            var table = document.getElementById("tableBody");
+            seasonStats.forEach(createRows)
+
+            function createRows(item){
+              var tr = document.createElement('tr');
+
+              var td1 = document.createElement('td');
+              var td2 = document.createElement('td');
+              var td3 = document.createElement('td');
+              var td4 = document.createElement('td');
+              var td5 = document.createElement('td');
+              var td6 = document.createElement('td');
+              var td7 = document.createElement('td');
+              var td8 = document.createElement('td');
+              var td9 = document.createElement('td');
+
+              var text1 = document.createTextNode((item['matchYear']-1)+'/'+item['matchYear']);
+              var text2 = document.createTextNode(item['cup']);
+              var text3 = document.createTextNode(item['matchAmount']);
+              var text4 = document.createTextNode(item['wins']);
+              var text5 = document.createTextNode(item['draws']);
+              var text6 = document.createTextNode(item['losts']);
+              var text7 = document.createTextNode(item['goalscored']);
+              var text8 = document.createTextNode(item['goalsLost']);
+              var text9 = document.createTextNode(item['laststage']);
+
+              td1.appendChild(text1);
+              td2.appendChild(text2);
+              td3.appendChild(text3);
+              td4.appendChild(text4);
+              td5.appendChild(text5);
+              td6.appendChild(text6);
+              td7.appendChild(text7);
+              td8.appendChild(text8);
+              td9.appendChild(text9);
+
+              tr.appendChild(td1);
+              tr.appendChild(td2);
+              tr.appendChild(td3);
+              tr.appendChild(td4);
+              tr.appendChild(td5);
+              tr.appendChild(td6);
+              tr.appendChild(td7);
+              tr.appendChild(td8);
+              tr.appendChild(td9);
+
+              table.appendChild(tr);
+            }
+
 
           }
     </script>
