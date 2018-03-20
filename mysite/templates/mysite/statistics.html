@@ -1,5 +1,3 @@
-{% load staticfiles %}
-
 <html>
     <head>
         <title>UEFA tool</title>
@@ -10,8 +8,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 -->
-        <link rel="stylesheet" type="text/css" href="/static/css/UEFAtool.css">
         <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/build/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" >
+        <link rel="stylesheet" type="text/css" href="/static/css/UEFAtool.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Demo scripts -->
@@ -64,7 +63,7 @@
         <div class="col-md-4 col-sm-6 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Pie Chart <small>Sessions</small></h2>
+              <h2>Wins - Losts - Draws<small>%</small></h2>
               <div class="clearfix"></div>
             </div>
             <div class="x_content2">
@@ -136,27 +135,6 @@
 
     </body>
 
-    <script>
-      $.ajax({
-          url:"/prepareStats/",
-          method: "GET", // or POST
-          dataType: "json",
-          data: {
-          //csrfmiddlewaretoken: csrf_token,
-           },
-          success:function(results){
-              console.log(results)
-              ProvideNumbers(results['GeneralStats'],results['HomeStats'])
-              createTable(results['seasonStats'])
-          },
-          failure: function(qXHR, textStatus, errorThrown) {
-          handleError(qXHR, textStatus, errorThrown)
-          }
-      }).fail(function(qXHR, textStatus, errorThrown){
-           handleError(qXHR, textStatus, errorThrown)
-      });
-    </script>
-
         <!-- jQuery -->
         <script src="/static/build/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap -->
@@ -184,7 +162,7 @@
       -->
         <!-- Custom Theme Scripts -->
         <!--
-        <script src="/static/build/custom.min.js"></script>
+        <script src="/static/build/custom.js"></script>
       -->
         <script src="/static/build/raphael.min.js"></script>
 
@@ -193,23 +171,24 @@
 
     <script type="text/javascript">
 
-    if ($('#graph_donut').length ){
+    function init_pie_graph(wins,draws,losts){
 
-    				Morris.Donut({
-    				  element: 'graph_donut',
-    				  data: [
-    					{label: 'Jam', value: 25},
-    					{label: 'Frosted', value: 40},
-    					{label: 'Custard', value: 25},
-    					{label: 'Sugar', value: 10}
-    				  ],
-    				  colors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
-    				  formatter: function (y) {
-    					return y + "%";
-    				  },
-    				  resize: true
-    				});
-    			}
+        				Morris.Donut({
+        				  element: 'graph_donut',
+        				  data: [
+        					{label: 'Wins', value: wins},
+        					{label: 'Draws', value: draws},
+        					{label: 'Losts', value: losts}
+        				  ],
+        				  colors: ['#26B99A', '#34495E', '#ACADAC'],
+        				  formatter: function (y) {
+                    y = Math.round((y/(wins+draws+losts))*100)
+        					return y + "%";
+        				  },
+        				  resize: true
+        				});
+
+    }
 
           if ($('#graph_bar1').length){
 
@@ -266,7 +245,91 @@
     				});
 
     			}
+//-----------------------table function
+          function init_DataTables() {
 
+    				console.log('run_datatables');
+
+    				if( typeof ($.fn.DataTable) === 'undefined'){ return; }
+    				console.log('init_DataTables');
+
+    				var handleDataTableButtons = function() {
+    				  if ($("#datatable-buttons").length) {
+    					$("#datatable-buttons").DataTable({
+    					  dom: "Blfrtip",
+    					  buttons: [
+    						{
+    						  extend: "copy",
+    						  className: "btn-sm"
+    						},
+    						{
+    						  extend: "csv",
+    						  className: "btn-sm"
+    						},
+    						{
+    						  extend: "excel",
+    						  className: "btn-sm"
+    						},
+    						{
+    						  extend: "pdfHtml5",
+    						  className: "btn-sm"
+    						},
+    						{
+    						  extend: "print",
+    						  className: "btn-sm"
+    						},
+    					  ],
+    					  responsive: true
+    					});
+    				  }
+    				};
+
+    				TableManageButtons = function() {
+    				  "use strict";
+    				  return {
+    					init: function() {
+    					  handleDataTableButtons();
+    					}
+    				  };
+    				}();
+
+    				$('#datatable').dataTable();
+
+    				$('#datatable-keytable').DataTable({
+    				  keys: true
+    				});
+
+    				$('#datatable-responsive').DataTable();
+
+    				$('#datatable-scroller').DataTable({
+    				  ajax: "js/datatables/json/scroller-demo.json",
+    				  deferRender: true,
+    				  scrollY: 380,
+    				  scrollCollapse: true,
+    				  scroller: true
+    				});
+
+    				$('#datatable-fixed-header').DataTable({
+    				  fixedHeader: true
+    				});
+
+    				var $datatable = $('#datatable-checkbox');
+
+    				$datatable.dataTable({
+    				  'order': [[ 1, 'asc' ]],
+    				  'columnDefs': [
+    					{ orderable: false, targets: [0] }
+    				  ]
+    				});
+    				$datatable.on('draw.dt', function() {
+    				  $('checkbox input').iCheck({
+    					checkboxClass: 'icheckbox_flat-green'
+    				  });
+    				});
+
+    				TableManageButtons.init();
+
+    			};
 
 
           function ProvideNumbers(GeneralStats,HomeStats){
@@ -335,8 +398,29 @@
 
               table.appendChild(tr);
             }
-
+            init_DataTables();
 
           }
+
+      $.ajax({
+          url:"/prepareStats/",
+          method: "GET", // or POST
+          dataType: "json",
+          data: {
+          //csrfmiddlewaretoken: csrf_token,
+           },
+          success:function(results){
+              console.log(results)
+              ProvideNumbers(results['GeneralStats'],results['HomeStats']);
+              init_pie_graph(results['GeneralStats'][0],results['GeneralStats'][1],results['GeneralStats'][2]);
+              createTable(results['seasonStats']);
+          },
+          failure: function(qXHR, textStatus, errorThrown) {
+          handleError(qXHR, textStatus, errorThrown)
+          }
+      }).fail(function(qXHR, textStatus, errorThrown){
+           handleError(qXHR, textStatus, errorThrown)
+      });
+
     </script>
 </html>
