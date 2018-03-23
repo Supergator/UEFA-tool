@@ -39,7 +39,7 @@
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
             <span class="count_top">Lost Matches</span>
-            <div class="count green" id="Losts">0</div>
+            <div class="count" id="Losts">0</div>
             <span class="count_bottom"><i class="green" id="HomeLosts">0 </i> Home</span>
           </div>
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
@@ -63,22 +63,22 @@
         <div class="col-md-4 col-sm-6 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Wins - Losts - Draws<small>%</small></h2>
+              <h2>Wins - Losts - Draws<p><small>%</small></p></h2>
               <div class="clearfix"></div>
             </div>
-            <div class="x_content2">
+            <div class="x_content2" style="margin-bottom:30px">
               <div id="graph_donut" style="width:100%; height:290px;"></div>
             </div>
           </div>
         </div>
 
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
+          <div class="x_panel" >
             <div class="x_title">
-              <h2>Bar Charts <small>Sessions</small></h2>
+              <h2>Most Frequent Opponents<p><small>by countries</small></p></h2>
               <div class="clearfix"></div>
             </div>
-            <div class="x_content">
+            <div class="x_content" style="margin-bottom:30px">
               <div id="graph_bar1" style="width:100%; height:280px;"></div>
             </div>
           </div>
@@ -87,10 +87,10 @@
         <div class="col-md-4 col-sm-6 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Bar Charts <small>Sessions</small></h2>
+              <h2>Most Frequent Opponents<p><small>by clubs</small></p></h2>
               <div class="clearfix"></div>
             </div>
-            <div class="x_content">
+            <div class="x_content" style="margin-bottom:30px">
               <div id="graph_bar2" style="width:100%; height:280px;"></div>
             </div>
           </div>
@@ -180,7 +180,7 @@
         					{label: 'Draws', value: draws},
         					{label: 'Losts', value: losts}
         				  ],
-        				  colors: ['#26B99A', '#34495E', '#ACADAC'],
+        				  colors: ['#26B99A', '#34495E', '#cc0040'],
         				  formatter: function (y) {
                     y = Math.round((y/(wins+draws+losts))*100)
         					return y + "%";
@@ -190,61 +190,38 @@
 
     }
 
-          if ($('#graph_bar1').length){
+          function init_country_graph(data){
 
     				Morris.Bar({
     				  element: 'graph_bar1',
-    				  data: [
-    					{device: 'iPhone 4', geekbench: 380},
-    					{device: 'iPhone 4S', geekbench: 655},
-    					{device: 'iPhone 3GS', geekbench: 275},
-    					{device: 'iPhone 5', geekbench: 1571},
-    					{device: 'iPhone 5S', geekbench: 655},
-    					{device: 'iPhone 6', geekbench: 2154},
-    					{device: 'iPhone 6 Plus', geekbench: 1144},
-    					{device: 'iPhone 6S', geekbench: 2371},
-    					{device: 'iPhone 6S Plus', geekbench: 1471},
-    					{device: 'Other', geekbench: 1371}
-    				  ],
-    				  xkey: 'device',
-    				  ykeys: ['geekbench'],
-    				  labels: ['Geekbench'],
+    				  data: data,
+    				  xkey: 'country',
+    				  ykeys: ['matches'],
+    				  labels: ['matches'],
     				  barRatio: 0.4,
     				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
     				  xLabelAngle: 35,
-    				  hideHover: 'auto',
+    				  //hideHover: 'auto',
     				  resize: true
     				});
-
     			}
 
-          if ($('#graph_bar2').length){
+          function init_club_graph(data){
 
     				Morris.Bar({
     				  element: 'graph_bar2',
-    				  data: [
-    					{device: 'iPhone 4', geekbench: 380},
-    					{device: 'iPhone 4S', geekbench: 655},
-    					{device: 'iPhone 3GS', geekbench: 275},
-    					{device: 'iPhone 5', geekbench: 1571},
-    					{device: 'iPhone 5S', geekbench: 655},
-    					{device: 'iPhone 6', geekbench: 2154},
-    					{device: 'iPhone 6 Plus', geekbench: 1144},
-    					{device: 'iPhone 6S', geekbench: 2371},
-    					{device: 'iPhone 6S Plus', geekbench: 1471},
-    					{device: 'Other', geekbench: 1371}
-    				  ],
-    				  xkey: 'device',
-    				  ykeys: ['geekbench'],
-    				  labels: ['Geekbench'],
+    				  data: data,
+    				  xkey: 'club',
+    				  ykeys: ['matches'],
+    				  labels: ['matches'],
     				  barRatio: 0.4,
     				  barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
     				  xLabelAngle: 35,
     				  hideHover: 'auto',
     				  resize: true
     				});
+          }
 
-    			}
 //-----------------------table function
           function init_DataTables() {
 
@@ -413,6 +390,8 @@
               console.log(results)
               ProvideNumbers(results['GeneralStats'],results['HomeStats']);
               init_pie_graph(results['GeneralStats'][0],results['GeneralStats'][1],results['GeneralStats'][2]);
+              init_country_graph(results['commonCountryArray'])
+              init_club_graph(results['commonClubArray'])
               createTable(results['seasonStats']);
           },
           failure: function(qXHR, textStatus, errorThrown) {

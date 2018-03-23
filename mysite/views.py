@@ -9,9 +9,10 @@ import re
 from django.http import JsonResponse
 from django.core import serializers
 import json
-from django.db.models import Q
+from django.db.models import Q,F
 from django.db.models import Max, Sum, Count
 from django.db import connection
+from django.db.models import CharField, Case, Value, When
 
 # Create your views here.
 def home_page(request):
@@ -334,6 +335,11 @@ def prepareStatistics(request):
 
             seasonStats[index]["matchAmount"] +=1
             seasonStats[index]["laststage"] = match.stage
+            if match.stage == 'Final':
+                if match.goals1 > match.goals2 and match.Team1 == ClubSelected:
+                    seasonStats[index]["laststage"] = 'WINNER'
+                elif match.goals2 > match.goals1 and match.Team2 == ClubSelected:
+                    seasonStats[index]["laststage"] = 'WINNER'
 
             if match.Team1 == ClubSelected:
 
@@ -376,6 +382,11 @@ def prepareStatistics(request):
 
             seasonStats[index]["matchAmount"] +=1
             seasonStats[index]["laststage"] = match.stage
+            if match.stage == 'Final':
+                if match.goals1 > match.goals2 and match.countryID1 == int(CountrySelected):
+                    seasonStats[index]["laststage"] = 'WINNER'
+                elif match.goals2 > match.goals1 and match.countryID2 == int(CountrySelected):
+                    seasonStats[index]["laststage"] = 'WINNER'
 
             if match.countryID1 == int(CountrySelected):
 
@@ -400,10 +411,38 @@ def prepareStatistics(request):
                 elif match.goals1 > match.goals2:
                     seasonStats[index]["losts"] +=1
 
+    commonCountry = data.annotate(opponent=Case(
+         When(countryID1=int(CountrySelected), then=F('country2')),
+         When(countryID2=int(CountrySelected), then=F('country1')),
+         output_field=CharField()) ).values('opponent').annotate(value=Count('opponent')).order_by('-value')[:5]
+
+    if ClubSelected != "0":
+        commonClub = data.annotate(opponent=Case(
+             When(Team1=ClubSelected, then=F('Team2')),
+             When(Team2=ClubSelected, then=F('Team1')),
+             output_field=CharField()) ).values('opponent').annotate(value=Count('opponent')).order_by('-value')[:5]
+    else:
+        commonClub = data.annotate(opponent=Case(
+             When(countryID1=int(CountrySelected), then=F('Team2')),
+             When(countryID2=int(CountrySelected), then=F('Team1')),
+             output_field=CharField()) ).values('opponent').annotate(value=Count('opponent')).order_by('-value')[:5]
+
+    commonCountryArray = []
+    for item in commonCountry:
+        commonCountryArray.append({'country':item['opponent'],'matches':item['value']})
+    commonClubArray = []
+    for item in commonClub:
+        commonClubArray.append({'club':item['opponent'],'matches':item['value']})
+
     #print(seasonStats)
     #print(GeneralStats)
     #print(HomeStats)
-    return JsonResponse({"GeneralStats":GeneralStats,"HomeStats":HomeStats,"seasonStats":seasonStats}, safe=False)
+    return JsonResponse({"GeneralStats":GeneralStats,
+                            "HomeStats":HomeStats,
+                            "seasonStats":seasonStats,
+                            "commonCountryArray":commonCountryArray,
+                            "commonClubArray":commonClubArray
+                            }, safe=False)
 
 
     sel = (1, 2, 3, 4, 5, 6)
